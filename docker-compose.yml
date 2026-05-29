@@ -7,30 +7,33 @@ services:
     container_name: mongodb-container
     restart: always
 
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${DB_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
-      MONGO_INITDB_DATABASE: testdb
-
     ports:
       - "27017:27017"
 
-    volumes:
-      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: testdb
+
+    networks:
+      - spring-net
 
   app:
     build: .
-    container_name: springboot-app
+    container_name: springapp
     restart: always
-
-    depends_on:
-      - mongodb
 
     ports:
       - "8082:8082"
 
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://${DB_USERNAME}:${DB_PASSWORD}@mongodb:27017/testdb?authSource=admin
+      SPRING_DATA_MONGODB_URI: mongodb://admin:admin123@mongodb:27017/testdb?authSource=admin
 
-volumes:
-  mongo_data:
+    depends_on:
+      - mongodb
+
+    networks:
+      - spring-net
+
+networks:
+  spring-net:
